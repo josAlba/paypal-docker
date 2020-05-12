@@ -1,0 +1,7 @@
+{
+    "name": "josalba/paypal",
+    "require": {
+        "paypal/paypal-checkout-sdk": "*",
+        "workerman/workerman": "^4.0"
+    }
+}
