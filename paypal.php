@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Core\ProductionEnvironment;
@@ -84,9 +84,62 @@ $data=array(
     "to"=>''    //Total
 );
 
+//Validar datos
+if(validate($data)){
 
+    if($data['q']=='new'){
+        //Nuevo pedido
+        return setPedido($data);
 
-/** Crear pedido */
+    }else if($data['q']=='find'){
+        //Buscar pedido
+        return getPedido($data);
+
+    }
+
+}else{
+    return json_encode(array(
+        "Validador"=>"Error en los campos"
+    ));
+}
+
+/**
+ * Validar parametros
+ * 
+ * @param array $d Datos a validar
+ * @return boolean
+ */
+function validate($d){
+
+    //Identificamos el tipo de peticion
+    if(isset($d['q'])){
+
+        if($d['q']=='new'){
+            //Validamos los datos para un nuevo pedido.
+            if(isset($d['f']) && isset($d['ref']) && isset($d['to'])){
+                return true;
+            }
+
+        }else if($d['q']=='find'){
+            //Validamos los datos para buscar un pedido.
+            if(isset($d['f']) && isset($d['ref'])){
+                return true;
+            }
+
+        }
+
+    }
+    
+
+    return false;
+
+}
+/**
+ * Crea un nuevo pedido para Paypal.
+ * 
+ * @param array $pedido Datos del pedido.
+ * @return string JSON devuelto.
+ */
 function setPedido($pedido){
 
     //Creamos el cliente
@@ -115,17 +168,38 @@ function setPedido($pedido){
 
     try{
 
-        // Call API with your client and get a response for your call
         $response = $client->execute($request);
-        
-        // If call returns body in response, you can get the deserialized version from the result attribute of the response
-        print_r($response);
+        return json_encode($response);
 
     }catch(HttpException $ex){
 
-        echo $ex->statusCode;
-        print_r($ex->getMessage());
+        return json_encode($ex->statusCode);
 
     }       
+
+}
+/**
+ * Busca un pedido en paypal
+ * 
+ * @param array $pedido Datos del pedido.
+ * @return string JSON devuelto.
+ */
+function getPedido($pedido){
+
+    //Creamos el cliente
+    $client = PayPalClient::client($pedido['f']);
+
+    $request = new OrdersCaptureRequest($pedido['ref']);
+    $request->prefer('return=representation');
+    try {
+        
+        $response = $client->execute($request);
+        
+        return json_encode($response);
+
+    }catch (HttpException $ex) {
+
+        return json_encode($ex->statusCode);
+    }
 
 }
