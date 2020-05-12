@@ -6,7 +6,8 @@
  * $data=array(
  *  "f"=>'',    //Fichero para leer
  *  "ref"=>'',  //Referencia
- *  "to"=>''    //Total
+ *  "to"=>'',   //Total
+ *  "q"=>'accion'
  * );
  * 
  */
@@ -26,23 +27,23 @@ ini_set('display_startup_errors', '1');
  */
 class PayPalClient{
 
-    private  $dev=true;
-    private  $CLIENT_ID      ='';
-    private  $CLIENT_SECRET  ='';
+    private static $dev=true;
+    private static $CLIENT_ID      ='';
+    private static $CLIENT_SECRET  ='';
 
     /**
      * Returns PayPal HTTP client instance with environment which has access
      * credentials context. This can be used invoke PayPal API's provided the
      * credentials have the access to do so.
      */
-    public function client($user='',$dev=true){
+    public static function client($user='',$dev=true){
         
-        $buffero = getFile::get();
+        $buffero = getFile::get($user);
 
-        $this->CLIENT_ID        =   $buffero->clientId; 
-        $this->CLIENT_SECRET    =   $buffero->clientSecret;
+        self::$CLIENT_ID        =   $buffero->clientId; 
+        self::$CLIENT_SECRET    =   $buffero->clientSecret;
 
-        $this->dev  = $dev;
+        self::$dev  = $dev;
 
         return new PayPalHttpClient(self::environment());
     }
@@ -52,12 +53,12 @@ class PayPalClient{
      * For demo purpose, we are using SandboxEnvironment. In production this will be
      * ProductionEnvironment.
      */
-    public function environment(){
+    public static function environment(){
 
-        $clientId = getenv("CLIENT_ID") ?: $this->CLIENT_ID;
-        $clientSecret = getenv("CLIENT_SECRET") ?: $this->CLIENT_SECRET;
+        $clientId = getenv("CLIENT_ID") ?: self::$CLIENT_ID;
+        $clientSecret = getenv("CLIENT_SECRET") ?: self::$CLIENT_SECRET;
 
-        if($this->dev==true){
+        if(self::$dev==true){
             return new SandboxEnvironment($clientId, $clientSecret);
         }else{
             return new SandboxEnvironment($clientId, $clientSecret);
@@ -71,19 +72,30 @@ class PayPalClient{
  */
 class getFile{
 
-    public function get($file=''){
+    public static function get($file=''){
 
         if($file==''){
+            print_r(array(
+                "fichero"=>1,
+                "name"=>$file
+            ));
             exit();
         }
-        if(!file_exists($file)){
-            exit();
-        }
+        
+        $file = __DIR__.'/user/'.$file.'.json';
 
-        $dir = __DIR__.'/user/'.$file;
+        if(!file_exists($file)){
+            print_r(array(
+                "fichero"=>2,
+                "name"=>$file
+            ));
+            exit();
+        }
 
         $gestor     = file_get_contents($file, true);
         $buffero    = json_decode($gestor);
+
+        return $buffero;
 
     }
 
@@ -116,7 +128,7 @@ class NoDB{
 
         //Nuevo fichero con los datos de la transaccion.
         $file = date("Y.m.d.H.i.s").'-'.md5($name).'.json';
-
+        $file = $dir.'/'.$file;
         //Almacenamos la transaccion.
         $ofile = fopen($file,'a');
         fwrite($ofile,$json);
@@ -174,7 +186,7 @@ class NoDB{
      */
     public static function setlog($name="",$id=""){
 
-        $ddf = fopen('transaccion.log','a');
+        $ddf = fopen(__DIR__.'/log/transaccion.log','a');
         fwrite($ddf,"[".date("r")."] Nueva transaccion: $name \t $id \r\n");
         fclose($ddf);
     } 
@@ -273,6 +285,9 @@ function setPedido($pedido){
     try{
 
         $response = $client->execute($request);
+
+        NoDB::set($pedido['ref'],json_encode($response));
+
         return json_encode($response);
 
     }catch(HttpException $ex){
