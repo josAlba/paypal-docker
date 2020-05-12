@@ -104,6 +104,98 @@ if(validate($data)){
 }
 
 /**
+ * Clase para almacenar los ficheros para el registro de transacciones
+ */
+class NoDB{
+
+    /**
+     * Almacena los datos en un archivo de json
+     * 
+     * @param string $name Nombre de la transaccion.
+     * @param string $json JSON con los datos de la transaccion.
+     */
+    public static function set($name,$json){
+
+        //Crea el directorio si aun no existe, para almacenar las transacciones.
+        if(! file_exists(__DIR__.'/transacciones') ){
+            mkdir(__DIR__.'/transacciones');
+        }
+
+        //ID - transaccion.
+        $dir = __DIR__.'/transacciones/'.md5($name);
+
+        //Comprueba si existe esta transaccion.
+        if(! file_exists($dir) ){
+            mkdir($dir);
+        }
+
+        //Nuevo fichero con los datos de la transaccion.
+        $file = date("Y.m.d.H.i.s").'-'.md5($name).'.json';
+
+        //Almacenamos la transaccion.
+        $ofile = fopen($file,'a');
+        fwrite($ofile,$json);
+
+        //Almacenamos en el log los datos de la transaccion.
+        self::setlog($name,$file);
+
+        return true;
+
+    }
+    /**
+     * Recupera informacion de una transaccion.
+     * 
+     * @param string $name Nombre de la transaccion.
+     * @return array Datos de las diferentes transacciones.
+     */
+    public static function get($name){
+
+        //Montamos el directorio de la transaccion.
+        $dir = __DIR__.'/transacciones/'.md5($name);
+
+        //Comprobamos que exista la transaccion.
+        if(! file_exists($dir) ){
+            return [];
+        }
+
+        $data = [];
+
+        //Recuperamos el listado de archivos.
+        $cdir  = scandir($dir);
+
+        //Recoremos los archivos de la transaccion, leemos el fichero y lo almacenamos en el array.
+        foreach ($cdir as $key => $value){
+
+            if (!in_array($value,array(".",".."))){
+
+                $gestor     = file_get_contents($dir.'/'.$value, true);
+                $buffero    = json_decode($gestor);
+
+                $data[]=$buffero;
+
+            }
+
+        }
+
+        //Devolvemos los datos de la transaccion.
+        return $data;
+
+    }
+    /**
+     * Almacena un log de correos eviados
+     * @access private
+     * @param string $name 
+     * @param string $id
+     */
+    public static function setlog($name="",$id=""){
+
+        $ddf = fopen('transaccion.log','a');
+        fwrite($ddf,"[".date("r")."] Nueva transaccion: $name \t $id \r\n");
+        fclose($ddf);
+    } 
+
+}
+/**
  * Validar parametros
  * 
  * @param array $d Datos a validar
