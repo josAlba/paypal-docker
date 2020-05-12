@@ -4,8 +4,8 @@
 
  $data=array(
    "f"=>'usuario',    //Fichero para leer
-   "ref"=>'',  //Referencia
-   "to"=>'',    //Total
+   "ref"=>'asas1s',  //Referencia
+   "to"=>'100',    //Total
    "q"=>'new'
  );
 

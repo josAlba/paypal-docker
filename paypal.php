@@ -128,7 +128,7 @@ class NoDB{
 
         //Nuevo fichero con los datos de la transaccion.
         $file = date("Y.m.d.H.i.s").'-'.md5($name).'.json';
-
+        $file = $dir.'/'.$file;
         //Almacenamos la transaccion.
         $ofile = fopen($file,'a');
         fwrite($ofile,$json);
@@ -186,7 +186,7 @@ class NoDB{
      */
     public static function setlog($name="",$id=""){
 
-        $ddf = fopen('transaccion.log','a');
+        $ddf = fopen(__DIR__.'/log/transaccion.log','a');
         fwrite($ddf,"[".date("r")."] Nueva transaccion: $name \t $id \r\n");
         fclose($ddf);
     } 
@@ -285,6 +285,9 @@ function setPedido($pedido){
     try{
 
         $response = $client->execute($request);
+
+        NoDB::set($pedido['ref'],json_encode($response));
+
         return json_encode($response);
 
     }catch(HttpException $ex){
