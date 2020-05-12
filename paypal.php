@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * 
+ * Estructura de los datos.
+ * 
+ * $data=array(
+ *  "f"=>'',    //Fichero para leer
+ *  "ref"=>'',  //Referencia
+ *  "to"=>''    //Total
+ * );
+ * 
+ */
 require __DIR__ . '/vendor/autoload.php';
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
@@ -56,7 +66,9 @@ class PayPalClient{
     }
 
 }
-
+/**
+ * Se encarga de leer los datos de configuracion del usuario.
+ */
 class getFile{
 
     public function get($file=''){
@@ -76,33 +88,6 @@ class getFile{
     }
 
 }
-
-
-$data=array(
-    "f"=>'',    //Fichero para leer
-    "ref"=>'',  //Referencia
-    "to"=>''    //Total
-);
-
-//Validar datos
-if(validate($data)){
-
-    if($data['q']=='new'){
-        //Nuevo pedido
-        return setPedido($data);
-
-    }else if($data['q']=='find'){
-        //Buscar pedido
-        return getPedido($data);
-
-    }
-
-}else{
-    return json_encode(array(
-        "Validador"=>"Error en los campos"
-    ));
-}
-
 /**
  * Clase para almacenar los ficheros para el registro de transacciones
  */
@@ -195,6 +180,33 @@ class NoDB{
     } 
 
 }
+
+
+/**
+ * Prende el inicio del script.
+ */
+function Mecha($data){
+
+    //Validar datos
+    if(validate($data)){
+
+        if($data['q']=='new'){
+            //Nuevo pedido
+            return setPedido($data);
+
+        }else if($data['q']=='find'){
+            //Buscar pedido
+            return getPedido($data);
+
+        }
+
+    }else{
+        return json_encode(array(
+            "Validador"=>"Error en los campos"
+        ));
+    }
+}
+
 /**
  * Validar parametros
  * 
