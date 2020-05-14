@@ -13,7 +13,8 @@
  *  *. Para capturar el pedido tiene que ser aprobado por el comprador.
  * 
  */
-require __DIR__ . '/vendor/autoload.php';
+//require __DIR__ . '/vendor/autoload.php';
+
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Core\ProductionEnvironment;
