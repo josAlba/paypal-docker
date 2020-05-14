@@ -15,8 +15,8 @@ require __DIR__ . '/vendor/autoload.php';
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Core\ProductionEnvironment;
-
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 
 ini_set('error_reporting', E_ALL); // or error_reporting(E_ALL);
 ini_set('display_errors', '1');
@@ -305,15 +305,25 @@ function setPedido($pedido){
  */
 function getPedido($pedido){
 
+    $p = NoDB::get($pedido['ref']);
+    if(count($p)==0){
+        
+        return json_encode(array(
+            "Find"=>"Pedido no encontrado"
+        ));
+    }
+
+    $seleccionado = $p[(count($p)-1)];
+    $r = $seleccionado->result->id;
+
     //Creamos el cliente
     $client = PayPalClient::client($pedido['f']);
-
-    $request = new OrdersCaptureRequest($pedido['ref']);
+    //Buscamos el pedido
+    $request = new OrdersCaptureRequest($r);
     $request->prefer('return=representation');
     try {
         
         $response = $client->execute($request);
-        
         return json_encode($response);
 
     }catch (HttpException $ex) {
