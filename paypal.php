@@ -10,6 +10,8 @@
  *  "q"=>'accion'
  * );
  * 
+ *  *. Para capturar el pedido tiene que ser aprobado por el comprador.
+ * 
  */
 require __DIR__ . '/vendor/autoload.php';
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
@@ -321,14 +323,31 @@ function getPedido($pedido){
     //Buscamos el pedido
     $request = new OrdersCaptureRequest($r);
     $request->prefer('return=representation');
+    echo "\n OK\n";
     try {
         
         $response = $client->execute($request);
-        return json_encode($response);
+        
+        return json_encode(array(
+            'find'=>array(
+                'query' => $pedido['ref'],
+                'id'    => $r,
+                'value' => true,
+                'data'  => $response
+            )
+        ));
 
-    }catch (HttpException $ex) {
+    }catch(Exception $ex) {
 
-        return json_encode($ex->statusCode);
+        return json_encode(array(
+            'find'=>array(
+                'query' => $pedido['ref'],
+                'id'    => $r,
+                'value' => false,
+                'description' => 'Pedido no encontrado'
+            )
+        ));
+    
     }
 
 }
