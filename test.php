@@ -2,6 +2,7 @@
 
  include(__DIR__.'/paypal.php');
 
+ /*
  $data=array(
    "f"=>'usuario',    //Fichero para leer
    "ref"=>'asas1s',  //Referencia
@@ -10,5 +11,13 @@
  );
 
  print_r(Mecha($data));
+ */
 
- echo "\n\n FIN: \n";
+ $data=array(
+  "f"=>'usuario',   //Fichero para leer
+  "ref"=>'asas1s',  //Referencia
+  "to"=>'100',      //Total
+  "q"=>'find'
+);
+
+print_r(Mecha($data));
