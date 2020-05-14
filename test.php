@@ -1,23 +1,4 @@
 <?php
 
- include(__DIR__.'/paypal.php');
-
- /*
- $data=array(
-   "f"=>'usuario',    //Fichero para leer
-   "ref"=>'asas1s',  //Referencia
-   "to"=>'100',    //Total
-   "q"=>'new'
- );
-
- print_r(Mecha($data));
- */
-
- $data=array(
-  "f"=>'usuario',   //Fichero para leer
-  "ref"=>'asas1s',  //Referencia
-  "to"=>'100',      //Total
-  "q"=>'find'
-);
-
-print_r(Mecha($data));
+ // 127.0.0.1:8021?f=usuario&ref=asas1s&to=100&q=new
+ // 127.0.0.1:8021?f=usuario&ref=asas1s&q=find

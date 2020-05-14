@@ -312,7 +312,12 @@ function getPedido($pedido){
     if(count($p)==0){
         
         return json_encode(array(
-            "Find"=>"Pedido no encontrado"
+            'find'=>array(
+                'query' => $pedido['ref'],
+                'id'    => "n/a",
+                'value' => false,
+                'description' => 'Pedido no existe'
+            )
         ));
     }
 
