@@ -26,6 +26,7 @@ $http_worker->onMessage = function($connection, $data){
             'Version'   =>"1.0.0",
             'Respuesta' =>'Servicio OK'
         )));
+        return;
     }
     
     $connection->send(Mecha($get));
