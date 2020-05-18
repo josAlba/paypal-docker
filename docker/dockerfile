@@ -1,0 +1,19 @@
+#Contenedor para ejecutar el microservicio.
+FROM ubuntu:20.04
+
+RUN apt-get update
+#Instalar php
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get install -y php php-cli php-curl
+#Instalar git
+RUN apt-get install -y git
+
+#Download git
+RUN mkdir /paypal
+RUN chmod 777 -R /paypal
+RUN git clone https://github.com/josAlba/paypal-docker.git /paypal
+
+#Conectamos el puerto
+EXPOSE 8020
+
+CMD cd /paypal && git pull && php _server.php start

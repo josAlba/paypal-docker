@@ -1,3 +1,4 @@
 user/*.json
 log/*.log
 transacciones/
+docker-production/
