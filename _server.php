@@ -18,9 +18,9 @@ $http_worker->onMessage = function($connection, $data){
      * Almacena los parametros GET recividos en la peticion
      * @var array GET
      */
-    $get = $data->get();
+    $post = $data->post();
 
-    if(count($get)==0){
+    if(count($post)==0){
         $connection->send(json_encode(array(
             'Servicio'  =>'Paypal',
             'Version'   =>"1.0.0",
@@ -29,7 +29,7 @@ $http_worker->onMessage = function($connection, $data){
         return;
     }
     
-    $connection->send(Mecha($get));
+    $connection->send(Mecha($post));
 
 };
 

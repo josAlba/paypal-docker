@@ -249,7 +249,6 @@ function validate($d){
 
     }
     
-
     return false;
 
 }
@@ -285,11 +284,15 @@ function setPedido($pedido){
         ] 
     ];
 
+    echo "\n Creando pedido: ".$pedido['f'];
+
     try{
 
         $response = $client->execute($request);
 
         NoDB::set($pedido['ref'],json_encode($response));
+
+        echo "\n Peido OK";
 
         return json_encode($response);
 
@@ -308,28 +311,39 @@ function setPedido($pedido){
  */
 function getPedido($pedido){
 
-    $p = NoDB::get($pedido['ref']);
-    if(count($p)==0){
-        
-        return json_encode(array(
-            'find'=>array(
-                'query' => $pedido['ref'],
-                'id'    => "n/a",
-                'value' => false,
-                'description' => 'Pedido no existe'
-            )
-        ));
+    if(!isset($pedido['token'])){
+
+        $p = NoDB::get($pedido['ref']);
+        if(count($p)==0){
+            
+            return json_encode(array(
+                'find'=>array(
+                    'query' => $pedido['ref'],
+                    'id'    => "n/a",
+                    'value' => false,
+                    'description' => 'Pedido no existe'
+                )
+            ));
+        }
+    
+        $seleccionado = $p[(count($p)-1)];
+        $r = $seleccionado->result->id;
+
+    }else{
+
+        $r = $pedido['token'];
+
     }
 
-    $seleccionado = $p[(count($p)-1)];
-    $r = $seleccionado->result->id;
+    echo "\n TOKEN: ".$r;
+    
 
     //Creamos el cliente
     $client = PayPalClient::client($pedido['f']);
     //Buscamos el pedido
     $request = new OrdersCaptureRequest($r);
     $request->prefer('return=representation');
-    echo "\n OK\n";
+    
     try {
         
         $response = $client->execute($request);
