@@ -39,7 +39,7 @@ class PayPalClient{
      * credentials context. This can be used invoke PayPal API's provided the
      * credentials have the access to do so.
      */
-    public static function client($user='',$dev=true){
+    public static function client($user='',$dev=false){
         
         $buffero = getFile::get($user);
 
@@ -64,7 +64,7 @@ class PayPalClient{
         if(self::$dev==true){
             return new SandboxEnvironment($clientId, $clientSecret);
         }else{
-            return new SandboxEnvironment($clientId, $clientSecret);
+            return new ProductionEnvironment($clientId, $clientSecret);
         }
         
     }
